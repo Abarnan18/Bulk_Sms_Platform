@@ -1,0 +1,81 @@
+/* Verify.css - Specific styles for the Verification page */
+
+.verify-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.auth-title {
+    /* Extending/Overriding Auth.css if needed */
+    margin-bottom: 0.5rem;
+}
+
+.otp-validity-wrapper {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.otp-validity-label {
+    color: #94a3b8;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.otp-validity-timer {
+    color: #a855f7;
+    /* Purple to match image */
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.resend-container {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #94a3b8;
+    font-size: 0.875rem;
+}
+
+.btn-resend-link {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    margin-left: 0.25rem;
+}
+
+.btn-resend-link:disabled {
+    color: #64748b;
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+.verify-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #334155;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.footer-link {
+    color: #94a3b8;
+    font-size: 0.875rem;
+    text-decoration: none;
+}
+
+.footer-action {
+    color: #818cf8;
+    /* Light indigo/purple */
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 0.25rem;
+}
+
+.footer-action:hover {
+    text-decoration: underline;
+}

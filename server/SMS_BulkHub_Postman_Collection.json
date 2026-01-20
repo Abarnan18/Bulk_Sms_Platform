@@ -1,0 +1,393 @@
+{
+    "info": {
+        "name": "SMS Bulk Hub API",
+        "description": "Complete API collection for testing SMS sending functionality",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"your_password\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Signup",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"secure_password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/signup",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "signup"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SMS - Single",
+            "item": [
+                {
+                    "name": "Send Single SMS - Success",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-api-key",
+                                "value": "{{apiKey}}",
+                                "description": "Your API Key (replace with actual key)"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"phoneNumber\": \"+1234567890\",\n  \"message\": \"Hello! This is a test SMS from SMS Bulk Hub.\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/message/send-single-sms",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "message",
+                                "send-single-sms"
+                            ]
+                        },
+                        "description": "Send a single SMS to one phone number"
+                    }
+                },
+                {
+                    "name": "Send Single SMS - No API Key (Should Fail)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"phoneNumber\": \"+1234567890\",\n  \"message\": \"This should fail without API key\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/message/send-single-sms",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "message",
+                                "send-single-sms"
+                            ]
+                        },
+                        "description": "Test error handling when API key is missing"
+                    }
+                },
+                {
+                    "name": "Send Single SMS - Invalid Phone Number (Should Fail)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-api-key",
+                                "value": "{{apiKey}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"phoneNumber\": \"invalid\",\n  \"message\": \"This should fail with invalid phone number\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/message/send-single-sms",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "message",
+                                "send-single-sms"
+                            ]
+                        },
+                        "description": "Test phone number validation"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SMS - Bulk (Manual)",
+            "item": [
+                {
+                    "name": "Send Bulk SMS - Array Format",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-api-key",
+                                "value": "{{apiKey}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"phoneNumbers\": [\"+1234567890\", \"+0987654321\", \"+1122334455\"],\n  \"message\": \"Bulk SMS test - sent to multiple recipients using array format\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/message/send-bulk-sms",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "message",
+                                "send-bulk-sms"
+                            ]
+                        },
+                        "description": "Send bulk SMS using phone numbers array"
+                    }
+                },
+                {
+                    "name": "Send Bulk SMS - Comma-Separated String",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-api-key",
+                                "value": "{{apiKey}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"phoneNumbers\": \"+1234567890,+0987654321,+1122334455\",\n  \"message\": \"Bulk SMS test - sent using comma-separated string\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/message/send-bulk-sms",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "message",
+                                "send-bulk-sms"
+                            ]
+                        },
+                        "description": "Send bulk SMS using comma-separated phone numbers"
+                    }
+                },
+                {
+                    "name": "Send Bulk SMS - Insufficient Credits (Should Fail)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-api-key",
+                                "value": "{{apiKey}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"phoneNumbers\": [\"+1111111111\", \"+2222222222\", \"+3333333333\", \"+4444444444\", \"+5555555555\", \"+6666666666\", \"+7777777777\", \"+8888888888\", \"+9999999999\", \"+1010101010\"],\n  \"message\": \"This should fail if you don't have enough credits for 10 recipients\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/message/send-bulk-sms",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "message",
+                                "send-bulk-sms"
+                            ]
+                        },
+                        "description": "Test credit validation (use this if your account has less than 10 credits)"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "SMS - Bulk (CSV Upload)",
+            "item": [
+                {
+                    "name": "Send Bulk SMS - CSV Upload",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-api-key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "csvFile",
+                                    "type": "file",
+                                    "src": "/path/to/your/sample_contacts.csv",
+                                    "description": "Upload your CSV file with phone numbers"
+                                },
+                                {
+                                    "key": "message",
+                                    "value": "Bulk SMS from CSV upload - testing the upload functionality",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/message/send-bulk-sms",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "message",
+                                "send-bulk-sms"
+                            ]
+                        },
+                        "description": "Send bulk SMS by uploading a CSV file. Update the file path in the request body."
+                    }
+                },
+                {
+                    "name": "Send Bulk SMS - Invalid File Type (Should Fail)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-api-key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "csvFile",
+                                    "type": "file",
+                                    "src": "/path/to/any/text.txt",
+                                    "description": "Try uploading a non-CSV file to test validation"
+                                },
+                                {
+                                    "key": "message",
+                                    "value": "This should fail because file is not CSV",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/message/send-bulk-sms",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "message",
+                                "send-bulk-sms"
+                            ]
+                        },
+                        "description": "Test file type validation - should only accept CSV files"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User Management",
+            "item": [
+                {
+                    "name": "Get User Data",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "x-api-key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/user/data",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "user",
+                                "data"
+                            ]
+                        },
+                        "description": "Get user data including credits balance"
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:5000",
+            "type": "string"
+        },
+        {
+            "key": "apiKey",
+            "value": "YOUR_API_KEY_HERE",
+            "type": "string"
+        }
+    ]
+}
