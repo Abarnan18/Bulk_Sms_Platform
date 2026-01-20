@@ -22,7 +22,7 @@ app.use(cors({
     origin: ["https://bulk-sms-platform-frontend.onrender.com", "http://localhost:5173"],
     credentials: true
 }));
-app.options("*", cors());
+app.options("/*", cors());
 
 //API endpoints Starts
 app.get("/", (req, res) => {
