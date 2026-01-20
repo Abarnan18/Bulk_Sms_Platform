@@ -9,7 +9,10 @@ export const AppContextProvider = (props) => {
     const [isLoggedin, setIsLoggedin] = useState(false);
     const [userData, setUserData] = useState(null);
 
-    axios.defaults.withCredentials = true;
+    const token = localStorage.getItem('token');
+    if (token) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
 
     const getUserData = async () => {
         try {
@@ -49,6 +52,8 @@ export const AppContextProvider = (props) => {
         try {
             const { data } = await axios.post(backendUrl + "/api/auth/logout");
             if (data.success) {
+                localStorage.removeItem('token');
+                delete axios.defaults.headers.common['Authorization'];
                 setIsLoggedin(false);
                 setUserData(null);
                 toast.success(data.message);
