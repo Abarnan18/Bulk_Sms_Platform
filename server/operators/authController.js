@@ -24,10 +24,9 @@ export const registerUser = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true,       // MUST be true on HTTPS
-            sameSite: "none",   // MUST be none for cross-site
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+            domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
         })
 
         const mailOptions = {
@@ -66,6 +65,7 @@ export const loginUser = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+            domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
         })
 
         if (user.role === "admin") {
