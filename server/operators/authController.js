@@ -27,6 +27,7 @@ export const registerUser = async (req, res) => {
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
             domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         })
 
         const mailOptions = {
@@ -66,6 +67,7 @@ export const loginUser = async (req, res) => {
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
             domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         })
 
         if (user.role === "admin") {
@@ -85,6 +87,7 @@ export const logoutUser = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+            domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
         })
         return res.status(200).json({ success: true, message: "User logged out successfully" })
     }
