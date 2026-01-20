@@ -16,21 +16,14 @@ const port = process.env.PORT || 5000;
 
 connectDB();
 
+app.set("trust proxy", 1);
+const allowedOrigins = ["https://bulk-sms-platform-frontend.onrender.com", "http://localhost:5173"];
+
 app.use(cors({
-    origin: (origin, callback) => {
-        const allowed = ["https://bulk-sms-platform-frontend.onrender.com", "http://localhost:5173"];
-        if (!origin || allowed.includes(origin) || origin.endsWith(".onrender.com")) {
-            callback(null, true);
-        } else {
-            callback(null, false);
-        }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"]
+    origin: allowedOrigins,
+    credentials: true
 }));
 app.options("*", cors());
-app.set("trust proxy", 1);
 app.use(cookieParser());
 app.use(express.json());
 
