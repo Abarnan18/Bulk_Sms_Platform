@@ -16,7 +16,13 @@ const port = process.env.PORT || 5000;
 
 connectDB();
 
-app.use(cors({ origin: ["https://bulk-sms-platform-frontend.onrender.com"], credentials: true }));
+app.use(cors({
+    origin: ["https://bulk-sms-platform-frontend.onrender.com", "http://localhost:5173"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"]
+}));
+app.options("*", cors()); // Explicitly handle preflight requests for all routes
 app.use(cookieParser());
 app.use(express.json());
 
