@@ -1,4 +1,4 @@
-import express, { Router } from "express";
+import express from "express";
 import "dotenv/config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -10,22 +10,19 @@ import testRouter from "./routes/testRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
 
 
-const app = express(); //create express app 
-
+const app = express();
+app.set("trust proxy", 1);
 const port = process.env.PORT || 5000;
 
 connectDB();
 
-app.set("trust proxy", 1);
-const allowedOrigins = ["https://bulk-sms-platform-frontend.onrender.com", "http://localhost:5173"];
-
+app.use(express.json());
+app.use(cookieParser());
 app.use(cors({
-    origin: allowedOrigins,
+    origin: ["https://bulk-sms-platform-frontend.onrender.com", "http://localhost:5173"],
     credentials: true
 }));
 app.options("*", cors());
-app.use(cookieParser());
-app.use(express.json());
 
 //API endpoints Starts
 app.get("/", (req, res) => {
