@@ -21,6 +21,7 @@ app.use(cookieParser());
 app.use(cors({
     origin: ["https://bulk-sms-platform-frontend.onrender.com", "http://localhost:5173"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
 
 }));
 
