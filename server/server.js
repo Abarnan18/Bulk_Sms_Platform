@@ -15,26 +15,28 @@ const port = process.env.PORT || 5000;
 
 connectDB();
 
-//  CORS middleware comes first
+// 1️⃣ CORS middleware - handles regular requests and preflight for all routes
+const allowedOrigins = [
+    "https://bulk-sms-platform-frontend.onrender.com"
+];
+
 app.use(cors({
     origin: function (origin, callback) {
-        const allowedOrigins = [
-            "https://bulk-sms-platform-frontend.onrender.com"//host frontend link
-        ];
-        if (!origin) return callback(null, true); // allow Postman/server calls
-        if (allowedOrigins.includes(origin)) {
+        // allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
-            callback(new Error("Not allowed by CORS"));
+            callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "x-api-key"]  //# Added x-api-key for API key auth
+    allowedHeaders: ["Content-Type", "Authorization", "x-api-key"]
 }));
 
-// 2️⃣ Handle preflight requests
-app.options("*", cors());
+// 2️⃣ Handle preflight requests for all routes (Express 5 uses (.*) for wildcard)
+app.options("(.*)", cors());
 
 // 3️⃣ Body parsers
 app.use(cookieParser());
