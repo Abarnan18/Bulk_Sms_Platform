@@ -13,11 +13,18 @@ export const AppContextProvider = (props) => {
     // ✅ Enable credentials for ALL requests
     axios.defaults.withCredentials = true;
 
-    // ✅ Add request/response interceptors for debugging
+    // ✅ Add interceptors to include Authorization header with stored token
     useEffect(() => {
         const requestInterceptor = axios.interceptors.request.use(
             (config) => {
-                console.log("📤 Request to:", config.url);
+                const token = localStorage.getItem('token');
+                if (token) {
+                    // Send token as Bearer token in Authorization header
+                    config.headers.Authorization = `Bearer ${token}`;
+                    console.log("📤 Request with Bearer token to:", config.url);
+                } else {
+                    console.log("📤 Request without token to:", config.url);
+                }
                 return config;
             },
             (error) => Promise.reject(error)
@@ -27,7 +34,8 @@ export const AppContextProvider = (props) => {
             (response) => response,
             (error) => {
                 if (error.response?.status === 401) {
-                    console.error("🔴 401 Unauthorized - Cookie not being sent");
+                    console.error("🔴 401 Unauthorized - Token invalid or expired");
+                    localStorage.removeItem('token');
                 }
                 return Promise.reject(error);
             }
@@ -41,12 +49,13 @@ export const AppContextProvider = (props) => {
 
     const getUserData = async () => {
         try {
-            // ✅ Explicitly include withCredentials to ensure cookie is sent
-            const { data } = await axios.get(backendUrl + "/api/user/data", { withCredentials: true });
+            // Token is automatically added by request interceptor
+            const { data } = await axios.get(backendUrl + "/api/user/data");
             
             if (data.success) {
                 setUserData(data.user);
                 setIsLoggedin(true);
+                console.log("✅ User data fetched successfully");
                 return true;
             } else {
                 setUserData(null);
@@ -54,7 +63,7 @@ export const AppContextProvider = (props) => {
                 return false;
             }
         } catch (error) {
-            console.error("Error fetching user data:", error.response?.status, error.message);
+            console.error("❌ Error fetching user data:", error.response?.status, error.message);
             setUserData(null);
             setIsLoggedin(false);
             return false;
@@ -65,20 +74,19 @@ export const AppContextProvider = (props) => {
 
     const login = async (email, password) => {
         try {
-            // ✅ Explicitly send cookies in login request
+            // Token will be added to response and stored
             const { data } = await axios.post(
                 backendUrl + "/api/auth/login",
-                { email, password },
-                { withCredentials: true } // 🔹 added
+                { email, password }
             );
 
             if (data.success) {
-                // Store token for reference/backup
+                // Store token for future requests
                 localStorage.setItem('token', data.token);
                 console.log("✅ Login successful, token stored");
                 
-                // Wait for cookie to be set
-                await new Promise(resolve => setTimeout(resolve, 200));
+                // Interceptor will now send Bearer token automatically
+                await new Promise(resolve => setTimeout(resolve, 100));
                 
                 const fetched = await getUserData();
                 if (fetched) {
@@ -91,7 +99,7 @@ export const AppContextProvider = (props) => {
                 return null;
             }
         } catch (error) {
-            console.error("Login error:", error);
+            console.error("❌ Login error:", error);
             toast.error(error.response?.data?.message || error.message);
             return null;
         }
@@ -99,20 +107,19 @@ export const AppContextProvider = (props) => {
 
     const register = async (email, password) => {
         try {
-            // ✅ Explicitly send cookies in register request
+            // Token will be added to response and stored
             const { data } = await axios.post(
                 backendUrl + "/api/auth/register",
-                { email, password },
-                { withCredentials: true } // 🔹 added
+                { email, password }
             );
 
             if (data.success) {
-                // Store token for reference/backup
+                // Store token for future requests
                 localStorage.setItem('token', data.token);
                 console.log("✅ Register successful, token stored");
                 
-                // Wait for cookie to be set
-                await new Promise(resolve => setTimeout(resolve, 200));
+                // Interceptor will now send Bearer token automatically
+                await new Promise(resolve => setTimeout(resolve, 100));
                 
                 const fetched = await getUserData();
                 if (fetched) {
@@ -125,7 +132,7 @@ export const AppContextProvider = (props) => {
                 return null;
             }
         } catch (error) {
-            console.error("Register error:", error);
+            console.error("❌ Register error:", error);
             toast.error(error.response?.data?.message || error.message);
             return null;
         }
@@ -133,9 +140,10 @@ export const AppContextProvider = (props) => {
 
     const logout = async () => {
         try {
-            const { data } = await axios.post(backendUrl + "/api/auth/logout", {}, { withCredentials: true }); // 🔹 added
+            // Token is automatically added by interceptor
+            const { data } = await axios.post(backendUrl + "/api/auth/logout");
             if (data.success) {
-                // Clear state
+                localStorage.removeItem('token');
                 setIsLoggedin(false);
                 setUserData(null);
                 toast.success(data.message);
