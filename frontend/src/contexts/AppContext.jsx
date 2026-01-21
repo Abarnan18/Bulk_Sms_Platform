@@ -10,8 +10,34 @@ export const AppContextProvider = (props) => {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // ✅ Enable cookies in all requests (backend sends token in httpOnly cookie)
+    // ✅ Enable credentials for ALL requests
     axios.defaults.withCredentials = true;
+
+    // ✅ Add request/response interceptors for debugging
+    useEffect(() => {
+        const requestInterceptor = axios.interceptors.request.use(
+            (config) => {
+                console.log("📤 Request to:", config.url);
+                return config;
+            },
+            (error) => Promise.reject(error)
+        );
+
+        const responseInterceptor = axios.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                if (error.response?.status === 401) {
+                    console.error("🔴 401 Unauthorized - Cookie not being sent");
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        return () => {
+            axios.interceptors.request.eject(requestInterceptor);
+            axios.interceptors.response.eject(responseInterceptor);
+        };
+    }, []);
 
     const getUserData = async () => {
         try {
@@ -47,11 +73,12 @@ export const AppContextProvider = (props) => {
             );
 
             if (data.success) {
-                // ✅ No need to store token in localStorage for auth; backend uses cookie
-                // localStorage.setItem('token', data.token); // 🔹 removed unnecessary storage
+                // Store token for reference/backup
+                localStorage.setItem('token', data.token);
+                console.log("✅ Login successful, token stored");
                 
-                // Small delay to ensure cookie is set
-                await new Promise(resolve => setTimeout(resolve, 100));
+                // Wait for cookie to be set
+                await new Promise(resolve => setTimeout(resolve, 200));
                 
                 const fetched = await getUserData();
                 if (fetched) {
@@ -80,11 +107,12 @@ export const AppContextProvider = (props) => {
             );
 
             if (data.success) {
-                // ✅ No need to store token in localStorage
-                // localStorage.setItem('token', data.token); // 🔹 removed
+                // Store token for reference/backup
+                localStorage.setItem('token', data.token);
+                console.log("✅ Register successful, token stored");
                 
-                // Small delay to ensure cookie is set
-                await new Promise(resolve => setTimeout(resolve, 100));
+                // Wait for cookie to be set
+                await new Promise(resolve => setTimeout(resolve, 200));
                 
                 const fetched = await getUserData();
                 if (fetched) {
@@ -118,8 +146,14 @@ export const AppContextProvider = (props) => {
     };
 
     useEffect(() => {
-        // ✅ Always try to fetch user data on mount using cookie; do NOT rely on localStorage
-        getUserData(); // 🔹 removed localStorage check
+        // Try to restore session from stored token/cookie
+        const token = localStorage.getItem('token');
+        if (token) {
+            console.log("🔄 Found stored token, fetching user data...");
+            getUserData();
+        } else {
+            setLoading(false);
+        }
     }, []);
 
     const value = {

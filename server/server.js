@@ -17,7 +17,9 @@ connectDB();
 
 // 1️⃣ CORS middleware - handles regular requests and preflight for all routes
 const allowedOrigins = [
-    "https://bulk-sms-platform-frontend.onrender.com"
+    "https://bulk-sms-platform-frontend.onrender.com",
+    "http://localhost:5173", // for local development
+    "http://localhost:3000"
 ];
 
 app.use(cors({
@@ -31,8 +33,9 @@ app.use(cors({
         }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "x-api-key"],
+    exposedHeaders: ["Content-Type"],
     optionsSuccessStatus: 200 // Some legacy browsers choke on 204
 }));
 
