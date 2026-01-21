@@ -32,13 +32,11 @@ app.use(cors({
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "x-api-key"]
+    allowedHeaders: ["Content-Type", "Authorization", "x-api-key"],
+    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
 }));
 
-// 2️⃣ Handle preflight requests for all routes (Express 5 uses (.*) for wildcard)
-app.options("(.*)", cors());
-
-// 3️⃣ Body parsers
+// 2️⃣ Body parsers (cors middleware above already handles preflight)
 app.use(cookieParser());
 app.use(express.json());
 
