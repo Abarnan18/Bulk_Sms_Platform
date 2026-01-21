@@ -24,9 +24,9 @@ export const registerUser = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true, // Always true for cross-site cookies
+            secure: true,
             sameSite: "none",
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
         })
 
         const mailOptions = {
@@ -65,7 +65,7 @@ export const loginUser = async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: "none",
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
         })
 
         if (user.role === "admin") {
