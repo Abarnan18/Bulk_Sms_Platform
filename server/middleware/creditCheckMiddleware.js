@@ -8,6 +8,12 @@ import User from "../models/userModel.js";
 export const checkCredits = async (req, res, next) => {
     try {
         // Get user from request (should be set by apiKeyAuth middleware)
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorized"  //# reqUserCheck corrected
+            });
+        }
         const userId = req.user._id || req.user.id;
 
         // Fetch latest user data to get current credits

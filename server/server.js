@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Router } from "express";
 import "dotenv/config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -9,22 +9,36 @@ import messageRouter from "./routes/messageRoutes.js";
 import testRouter from "./routes/testRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
 
+const app = express(); //create express app 
 
-const app = express();
-app.set("trust proxy", 1);
 const port = process.env.PORT || 5000;
 
 connectDB();
 
-app.use(express.json());
-app.use(cookieParser());
+//  CORS middleware comes first
 app.use(cors({
-    origin: ["https://bulk-sms-platform-frontend.onrender.com", "http://localhost:5173"],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    origin: function (origin, callback) {
+        const allowedOrigins = [
+            "https://bulk-sms-platform-frontend.onrender.com"//host frontend link
+        ];
+        if (!origin) return callback(null, true); // allow Postman/server calls
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     credentials: true,
-
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "x-api-key"]  //# Added x-api-key for API key auth
 }));
 
+// 2️⃣ Handle preflight requests
+app.options("*", cors());
+
+// 3️⃣ Body parsers
+app.use(cookieParser());
+app.use(express.json());
 
 //API endpoints Starts
 app.get("/", (req, res) => {
@@ -35,4 +49,5 @@ app.use("/api/user", userRouter);
 app.use("/api/msg", messageRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/test", testRouter)
+
 app.listen(port, () => console.log(`Server is running on port ${port}`));
