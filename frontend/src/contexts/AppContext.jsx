@@ -12,14 +12,29 @@ export const AppContextProvider = (props) => {
 
     axios.defaults.withCredentials = true;
 
-    const token = localStorage.getItem('token');
-    if (token) {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
+    // Set up axios interceptor to always include the latest token
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        } else {
+            delete axios.defaults.headers.common['Authorization'];
+        }
+    }, []);
 
     const getUserData = async () => {
         try {
-            const { data } = await axios.get(backendUrl + "/api/user/data");
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setLoading(false);
+                return false;
+            }
+            
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            const { data } = await axios.get(backendUrl + "/api/user/data", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
             if (data.success) {
                 setUserData(data.user);
                 setIsLoggedin(true);
@@ -30,6 +45,7 @@ export const AppContextProvider = (props) => {
                 return false;
             }
         } catch (error) {
+            console.error("Error fetching user data:", error);
             setUserData(null);
             setIsLoggedin(false);
             return false;
@@ -43,7 +59,12 @@ export const AppContextProvider = (props) => {
             const { data } = await axios.post(backendUrl + "/api/auth/login", { email, password });
             if (data.success) {
                 localStorage.setItem('token', data.token);
+                // Set header immediately after storing token
                 axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+                
+                // Give a small delay to ensure header is set
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
                 const fetched = await getUserData();
                 if (fetched) {
                     toast.success(data.message);
@@ -55,6 +76,7 @@ export const AppContextProvider = (props) => {
                 return null;
             }
         } catch (error) {
+            console.error("Login error:", error);
             toast.error(error.response?.data?.message || error.message);
             return null;
         }
@@ -66,6 +88,10 @@ export const AppContextProvider = (props) => {
             if (data.success) {
                 localStorage.setItem('token', data.token);
                 axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+                
+                // Give a small delay to ensure header is set
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
                 const fetched = await getUserData();
                 if (fetched) {
                     toast.success(data.message);
@@ -77,6 +103,7 @@ export const AppContextProvider = (props) => {
                 return null;
             }
         } catch (error) {
+            console.error("Register error:", error);
             toast.error(error.response?.data?.message || error.message);
             return null;
         }
