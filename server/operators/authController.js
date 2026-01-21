@@ -69,7 +69,7 @@ export const registerUser = async (req, res) => {
 };
 
 // ==========================
-// LOGIN USER (UNCHANGED)
+// LOGIN USER 
 // ==========================
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
@@ -205,7 +205,7 @@ export const verifyOtp = async (req, res) => {
         user.otp = null;
         user.otpExpiry = null;
         user.apiKey = Math.floor(10000 + Math.random() * 90000);
-        user.credits = 10;
+        user.credits = 0;
         await user.save();
 
         return res.status(200).json({

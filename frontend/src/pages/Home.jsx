@@ -15,7 +15,7 @@ const Home = () => {
                         Welcome to <span className='brand-name'>MsgBulkHub</span>
                     </h1>
                     <p className='hero-subtitle'>
-                        Send bulk SMS messages to thousands of contacts instantly
+                        Send bulk messages to thousands of contacts within seconds!
                     </p>
 
                     {!isLoggedin ? (
