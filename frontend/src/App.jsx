@@ -14,7 +14,16 @@ import Verify from './pages/Verify'
 import SmsHistory from './pages/SmsHistory'
 
 const App = () => {
-  const { isLoggedin, userData } = useContext(AppContext)
+  const { isLoggedin, userData, loading } = useContext(AppContext)
+
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="spinner"></div>
+        <p>Initializing...</p>
+      </div>
+    )
+  }
 
   return (
     <div className='app-main'>
@@ -24,8 +33,16 @@ const App = () => {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={!isLoggedin ? <Login /> : <Navigate to={userData?.role === 'admin' ? '/admin' : '/'} />} />
-        <Route path="/signup" element={!isLoggedin ? <Signup /> : <Navigate to={userData?.role === 'admin' ? '/admin' : '/'} />} />
+
+        {/* Redirect away from Login/Signup if already logged in */}
+        <Route
+          path="/login"
+          element={!isLoggedin ? <Login /> : <Navigate to={userData?.role === 'admin' ? '/admin' : '/user'} />}
+        />
+        <Route
+          path="/signup"
+          element={!isLoggedin ? <Signup /> : <Navigate to={userData?.role === 'admin' ? '/admin' : '/user'} />}
+        />
 
         <Route path="/verify" element={isLoggedin ? <Verify /> : <Navigate to="/login" />} />
 
@@ -39,7 +56,7 @@ const App = () => {
           element={
             isLoggedin && userData?.role === 'admin'
               ? <AdminDashboard />
-              : <Navigate to="/" />
+              : <Navigate to="/login" />
           }
         />
 

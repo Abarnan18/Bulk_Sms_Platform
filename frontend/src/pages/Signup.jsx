@@ -19,14 +19,11 @@ const Signup = () => {
 
     const onSubmitHandler = async (e) => {
         e.preventDefault()
-        const success = await register(email, password)
-        if (success) {
+        const data = await register(email, password)
+        if (data && data.success) {
             setEmail('')
             setPassword('')
-            // Use a short timeout to ensure state is updated before navigating
-            setTimeout(() => {
-                navigate('/user')
-            }, 100)
+            navigate('/user')
         }
     }
 

@@ -18,18 +18,15 @@ const Login = () => {
 
     const onSubmitHandler = async (e) => {
         e.preventDefault()
-        const success = await login(email, password)
-        if (success) {
+        const data = await login(email, password)
+        if (data && data.success) {
             setEmail('')
             setPassword('')
-            // Redirect based on role after a short delay for userData to update
-            setTimeout(() => {
-                if (userData?.role === 'admin') {
-                    navigate('/admin')
-                } else {
-                    navigate('/user')
-                }
-            }, 100)
+            if (data.user?.role === 'admin') {
+                navigate('/admin')
+            } else {
+                navigate('/user')
+            }
         }
     }
 
@@ -81,7 +78,7 @@ const Login = () => {
                     <div className='form-group'>
                         <div className='input-icon-wrapper'>
                             <span className='input-icon'>🔒</span>
-                            <input 
+                            <input
                                 onChange={e => setPassword(e.target.value)}
                                 value={password}
                                 className='auth-input'
