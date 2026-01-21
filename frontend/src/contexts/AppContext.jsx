@@ -9,6 +9,8 @@ export const AppContextProvider = (props) => {
     const [isLoggedin, setIsLoggedin] = useState(false);
     const [userData, setUserData] = useState(null);
 
+    axios.defaults.withCredentials = true;
+
     const token = localStorage.getItem('token');
     if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -34,6 +36,28 @@ export const AppContextProvider = (props) => {
         try {
             const { data } = await axios.post(backendUrl + "/api/auth/login", { email, password });
             if (data.success) {
+                localStorage.setItem('token', data.token);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+                setIsLoggedin(true);
+                await getUserData();
+                toast.success(data.message);
+                return true;
+            } else {
+                toast.error(data.message);
+                return false;
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
+            return false;
+        }
+    };
+
+    const register = async (email, password) => {
+        try {
+            const { data } = await axios.post(backendUrl + "/api/auth/register", { email, password });
+            if (data.success) {
+                localStorage.setItem('token', data.token);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
                 setIsLoggedin(true);
                 await getUserData();
                 toast.success(data.message);
@@ -73,6 +97,7 @@ export const AppContextProvider = (props) => {
         userData, setUserData,
         getUserData,
         login,
+        register,
         logout
     };
 

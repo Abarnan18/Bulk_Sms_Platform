@@ -24,9 +24,8 @@ export const registerUser = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-            domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
+            secure: true, // Always true for cross-site cookies
+            sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         })
 
@@ -38,7 +37,7 @@ export const registerUser = async (req, res) => {
         }
 
         await transporter.sendMail(mailOptions);
-        return res.status(200).json({ success: true, message: "User registered successfully" })
+        return res.status(200).json({ success: true, message: "User registered successfully", token })
     } catch (error) {
         return res.json({ success: false, message: error.message })
     }
@@ -64,9 +63,8 @@ export const loginUser = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-            domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
+            secure: true,
+            sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         })
 
@@ -85,9 +83,8 @@ export const logoutUser = async (req, res) => {
     try {
         res.clearCookie('token', {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-            domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
+            secure: true,
+            sameSite: "none"
         })
         return res.status(200).json({ success: true, message: "User logged out successfully" })
     }

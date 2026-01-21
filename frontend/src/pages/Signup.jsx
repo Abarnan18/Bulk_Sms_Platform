@@ -7,7 +7,7 @@ import '../css/Auth.css'
 
 const Signup = () => {
     const navigate = useNavigate()
-    const { backendUrl, setIsLoggedin, getUserData, userData } = useContext(AppContext)
+    const { register, userData } = useContext(AppContext)
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -18,26 +18,15 @@ const Signup = () => {
     }, [])
 
     const onSubmitHandler = async (e) => {
-        try {
-            e.preventDefault()
-            axios.defaults.withCredentials = true
-            const { data } = await axios.post(backendUrl + '/api/auth/register', { email, password })
-
-            if (data.success) {
-                setIsLoggedin(true)
-                await getUserData()
-                toast.success('Account registered successfully! 🎉')
-                setEmail('')
-                setPassword('')
-                // Redirect to user dashboard (new users are created as 'user' role by default)
-                setTimeout(() => {
-                    navigate('/user')
-                }, 500)
-            } else {
-                toast.error(data.message)
-            }
-        } catch (error) {
-            toast.error(error.response?.data?.message || error.message)
+        e.preventDefault()
+        const success = await register(email, password)
+        if (success) {
+            setEmail('')
+            setPassword('')
+            // Use a short timeout to ensure state is updated before navigating
+            setTimeout(() => {
+                navigate('/user')
+            }, 100)
         }
     }
 

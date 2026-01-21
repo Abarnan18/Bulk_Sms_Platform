@@ -10,7 +10,7 @@ const connectDB = async () => {
             console.error("MongoDB connection error:", err);
         })
 
-        await mongoose.connect(`${process.env.MONGODB_URI}`);
+        await mongoose.connect(`${process.env.MONGODB_URI}Mini_Sms`);
     } catch (error) {
         console.error("Failed to connect to MongoDB:", error.message);
         // Do not crash immediately, allowing retries or clean exit
