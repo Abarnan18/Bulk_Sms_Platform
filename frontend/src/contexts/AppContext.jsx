@@ -10,30 +10,13 @@ export const AppContextProvider = (props) => {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // CRITICAL: Enable cookies in all requests (backend sends token in httpOnly cookie)
     axios.defaults.withCredentials = true;
-
-    // Set up axios interceptor to always include the latest token
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        } else {
-            delete axios.defaults.headers.common['Authorization'];
-        }
-    }, []);
 
     const getUserData = async () => {
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                setLoading(false);
-                return false;
-            }
-            
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            const { data } = await axios.get(backendUrl + "/api/user/data", {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            // Cookies are automatically sent with credentials: true
+            const { data } = await axios.get(backendUrl + "/api/user/data");
             
             if (data.success) {
                 setUserData(data.user);
@@ -45,7 +28,7 @@ export const AppContextProvider = (props) => {
                 return false;
             }
         } catch (error) {
-            console.error("Error fetching user data:", error);
+            console.error("Error fetching user data:", error.response?.status, error.message);
             setUserData(null);
             setIsLoggedin(false);
             return false;
@@ -58,11 +41,10 @@ export const AppContextProvider = (props) => {
         try {
             const { data } = await axios.post(backendUrl + "/api/auth/login", { email, password });
             if (data.success) {
-                localStorage.setItem('token', data.token);
-                // Set header immediately after storing token
-                axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+                // Backend automatically sets httpOnly cookie - no need to store token in localStorage
+                localStorage.setItem('token', data.token); // Keep for reference
                 
-                // Give a small delay to ensure header is set
+                // Small delay to ensure cookie is set
                 await new Promise(resolve => setTimeout(resolve, 100));
                 
                 const fetched = await getUserData();
@@ -86,10 +68,10 @@ export const AppContextProvider = (props) => {
         try {
             const { data } = await axios.post(backendUrl + "/api/auth/register", { email, password });
             if (data.success) {
-                localStorage.setItem('token', data.token);
-                axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+                // Backend automatically sets httpOnly cookie - no need to store token in localStorage
+                localStorage.setItem('token', data.token); // Keep for reference
                 
-                // Give a small delay to ensure header is set
+                // Small delay to ensure cookie is set
                 await new Promise(resolve => setTimeout(resolve, 100));
                 
                 const fetched = await getUserData();
