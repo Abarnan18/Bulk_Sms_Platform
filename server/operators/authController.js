@@ -61,9 +61,10 @@ export const registerUser = async (req, res) => {
         });
 
     } catch (error) {
-        return res.status(400).json({
+        console.error("❌ Registration error:", error.message, error);
+        return res.status(500).json({
             success: false,
-            message: error.message
+            message: "Registration failed: " + error.message
         });
     }
 };
@@ -109,7 +110,11 @@ export const loginUser = async (req, res) => {
         }
 
     } catch (error) {
-        return res.json({ success: false, message: error.message });
+        console.error("❌ Login error:", error.message, error);
+        return res.status(500).json({ 
+            success: false, 
+            message: "Login failed: " + error.message 
+        });
     }
 };
 

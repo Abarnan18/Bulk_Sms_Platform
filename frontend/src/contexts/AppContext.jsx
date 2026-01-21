@@ -99,8 +99,9 @@ export const AppContextProvider = (props) => {
                 return null;
             }
         } catch (error) {
-            console.error("❌ Login error:", error);
-            toast.error(error.response?.data?.message || error.message);
+            const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message;
+            console.error("❌ Login error:", errorMsg, error);
+            toast.error("Login failed: " + errorMsg);
             return null;
         }
     };
@@ -132,8 +133,9 @@ export const AppContextProvider = (props) => {
                 return null;
             }
         } catch (error) {
-            console.error("❌ Register error:", error);
-            toast.error(error.response?.data?.message || error.message);
+            const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message;
+            console.error("❌ Register error:", errorMsg, error);
+            toast.error("Registration failed: " + errorMsg);
             return null;
         }
     };
