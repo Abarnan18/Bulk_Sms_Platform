@@ -98,7 +98,12 @@ export const AppContextProvider = (props) => {
     };
 
     useEffect(() => {
-        getUserData();
+        const token = localStorage.getItem('token');
+        if (token) {
+            getUserData();
+        } else {
+            setLoading(false);
+        }
     }, []);
 
     const value = {
