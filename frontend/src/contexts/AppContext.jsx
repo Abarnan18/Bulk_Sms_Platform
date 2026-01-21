@@ -10,13 +10,13 @@ export const AppContextProvider = (props) => {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // CRITICAL: Enable cookies in all requests (backend sends token in httpOnly cookie)
+    // ✅ Enable cookies in all requests (backend sends token in httpOnly cookie)
     axios.defaults.withCredentials = true;
 
     const getUserData = async () => {
         try {
-            // Cookies are automatically sent with credentials: true
-            const { data } = await axios.get(backendUrl + "/api/user/data");
+            // ✅ Explicitly include withCredentials to ensure cookie is sent
+            const { data } = await axios.get(backendUrl + "/api/user/data", { withCredentials: true });
             
             if (data.success) {
                 setUserData(data.user);
@@ -39,10 +39,16 @@ export const AppContextProvider = (props) => {
 
     const login = async (email, password) => {
         try {
-            const { data } = await axios.post(backendUrl + "/api/auth/login", { email, password });
+            // ✅ Explicitly send cookies in login request
+            const { data } = await axios.post(
+                backendUrl + "/api/auth/login",
+                { email, password },
+                { withCredentials: true } // 🔹 added
+            );
+
             if (data.success) {
-                // Backend automatically sets httpOnly cookie - no need to store token in localStorage
-                localStorage.setItem('token', data.token); // Keep for reference
+                // ✅ No need to store token in localStorage for auth; backend uses cookie
+                // localStorage.setItem('token', data.token); // 🔹 removed unnecessary storage
                 
                 // Small delay to ensure cookie is set
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -66,10 +72,16 @@ export const AppContextProvider = (props) => {
 
     const register = async (email, password) => {
         try {
-            const { data } = await axios.post(backendUrl + "/api/auth/register", { email, password });
+            // ✅ Explicitly send cookies in register request
+            const { data } = await axios.post(
+                backendUrl + "/api/auth/register",
+                { email, password },
+                { withCredentials: true } // 🔹 added
+            );
+
             if (data.success) {
-                // Backend automatically sets httpOnly cookie - no need to store token in localStorage
-                localStorage.setItem('token', data.token); // Keep for reference
+                // ✅ No need to store token in localStorage
+                // localStorage.setItem('token', data.token); // 🔹 removed
                 
                 // Small delay to ensure cookie is set
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -93,10 +105,9 @@ export const AppContextProvider = (props) => {
 
     const logout = async () => {
         try {
-            const { data } = await axios.post(backendUrl + "/api/auth/logout");
+            const { data } = await axios.post(backendUrl + "/api/auth/logout", {}, { withCredentials: true }); // 🔹 added
             if (data.success) {
-                localStorage.removeItem('token');
-                delete axios.defaults.headers.common['Authorization'];
+                // Clear state
                 setIsLoggedin(false);
                 setUserData(null);
                 toast.success(data.message);
@@ -107,12 +118,8 @@ export const AppContextProvider = (props) => {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            getUserData();
-        } else {
-            setLoading(false);
-        }
+        // ✅ Always try to fetch user data on mount using cookie; do NOT rely on localStorage
+        getUserData(); // 🔹 removed localStorage check
     }, []);
 
     const value = {
