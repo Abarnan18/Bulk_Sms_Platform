@@ -28,15 +28,29 @@ const UserDashboard = () => {
     const [inputMethod, setInputMethod] = useState('manual')
     const [failedNumbers, setFailedNumbers] = useState('')
 
+    const [isOtpLoading, setIsOtpLoading] = useState(false)
+
     const sendOtp = async () => {
+        if (isOtpLoading) return;
+        setIsOtpLoading(true);
+        const toastId = toast.loading("Sending verification email...")
         try {
             const { data } = await axios.post(backendUrl + '/api/auth/send-otp', { userId: userData._id })
             if (data.success) {
-                toast.success(data.message)
+                toast.update(toastId, { render: data.message, type: "success", isLoading: false, autoClose: 3000 });
                 navigate('/verify')
+            } else {
+                toast.update(toastId, { render: data.message, type: "error", isLoading: false, autoClose: 3000 });
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || error.message)
+            toast.update(toastId, {
+                render: error.response?.data?.message || "Failed to send email. Check backend connectivity.",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000
+            });
+        } finally {
+            setIsOtpLoading(false);
         }
     }
 
@@ -187,7 +201,9 @@ const UserDashboard = () => {
                             <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Confirm your email to enable messaging services.</p>
                         </div>
                     </div>
-                    <button onClick={sendOtp} className='btn-banner' style={{ background: 'var(--warning)' }}>VERIFY NOW</button>
+                    <button onClick={sendOtp} disabled={isOtpLoading} className='btn-banner' style={{ background: 'var(--warning)', opacity: isOtpLoading ? 0.7 : 1 }}>
+                        {isOtpLoading ? 'SENDING...' : 'VERIFY NOW'}
+                    </button>
                 </div>
             )}
 

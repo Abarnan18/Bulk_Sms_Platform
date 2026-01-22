@@ -9,16 +9,21 @@ import transporter from "../config/nodemailer.js";
 
 const sendEmail = async ({ to, subject, text }) => {
     try {
-        await transporter.sendMail({
-            from: process.env.SENDER_EMAIL,
+        console.log(`📡 Attempting to send email to ${to}...`);
+        const info = await transporter.sendMail({
+            from: `MsgBulkHUB <${process.env.SENDER_EMAIL}>`,
             to,
             subject,
             text
         });
-        console.log(`📧 Email sent to ${to}`);
+        console.log(`✅ Email sent successfully: ${info.messageId}`);
     } catch (error) {
-        console.error("❌ Email send failed:", error);
-        throw new Error("Email service unavailable");
+        console.error("❌ Email transmission failed:", error.message);
+        // Special log for authenticated user mismatch
+        if (error.message.includes('Authenticated sender')) {
+            console.error("💡 Check if SENDER_EMAIL matches Brevo verified sender.");
+        }
+        throw new Error(`Email service failed: ${error.message}`);
     }
 };
 

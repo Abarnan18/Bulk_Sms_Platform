@@ -44,23 +44,27 @@ const Verify = () => {
     }
 
     const resendOtp = async () => {
-        if (timer > 0) return
+        if (timer > 0 || isResending) return
 
         setIsResending(true)
+        const toastId = toast.loading("Resending verification code...")
         try {
             const { data } = await axios.post(backendUrl + '/api/auth/send-otp', {
                 userId: userData._id,
                 resend: true
             })
             if (data.success) {
-                toast.success(data.message)
+                toast.update(toastId, { render: data.message, type: "success", isLoading: false, autoClose: 3000 });
                 setTimer(30)
                 setValidityTimer(600) // Reset validity timer on resend
+            } else {
+                toast.update(toastId, { render: data.message, type: "error", isLoading: false, autoClose: 3000 });
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to resend code')
-            if (error.response?.data?.message.includes('wait')) {
-                const seconds = parseInt(error.response.data.message.match(/\d+/)?.[0] || '30')
+            const msg = error.response?.data?.message || 'Failed to resend code';
+            toast.update(toastId, { render: msg, type: "error", isLoading: false, autoClose: 3000 });
+            if (msg.includes('wait')) {
+                const seconds = parseInt(msg.match(/\d+/)?.[0] || '30')
                 setTimer(seconds)
             }
         } finally {
