@@ -56,15 +56,16 @@ export const registerUser = async (req, res) => {
             token
         });
 
-        // Send welcome email asynchronously (doesn't block response)
-        transporter.sendMail({
+        // send welcome email
+        const mailOptions = {
             from: process.env.SENDER_EMAIL,
             to: email,
-            subject: "Welcome to MsgBulkHUB",
-            text: "Thank you for registering to MsgBulkHUB. You can now send bulk SMS within minutes."
-        })
-        .then(() => console.log(`📧 Welcome email sent to ${email}`))
-        .catch(err => console.error(`❌ Failed to send email to ${email}:`, err));
+            subject: "Welcome to MsgBulkHUB-send A LOT....",
+            text: `Thank you for registering to the MsgBulkHUB. You can now Send Bulk sms within minutes`
+        }
+
+        await transporter.sendMail(mailOptions);
+        return res.status(200).json({ success: true, message: "User registered successfully" })
 
     } catch (error) {
         console.error("❌ Registration error:", error.message, error);
