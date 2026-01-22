@@ -242,7 +242,7 @@ const UserDashboard = () => {
                         <form onSubmit={sendSingleSms}>
                             <div className='form-input-group'>
                                 <label className='form-label'>DESTINATION NUMBER</label>
-                                <input value={recipient} onChange={e => setRecipient(e.target.value)} className='form-input' type="text" placeholder="+1234567890" required />
+                                <input value={recipient} onChange={e => setRecipient(e.target.value)} className='form-input' type="text" placeholder="please enter only 94712345678 format " required />
                             </div>
                             <div className='form-input-group'>
                                 <label className='form-label'>MESSAGE CONTENT</label>
@@ -287,7 +287,7 @@ const UserDashboard = () => {
                             ) : (
                                 <div className='form-input-group'>
                                     <label className='form-label'>ENTER NUMBERS (COMMA SEPARATED)</label>
-                                    <textarea value={bulkNumbers} onChange={e => setBulkNumbers(e.target.value)} className='form-textarea' style={{ height: '4rem' }} placeholder="+123, +456, +789..." required={inputMethod === 'manual'}></textarea>
+                                    <textarea value={bulkNumbers} onChange={e => setBulkNumbers(e.target.value)} className='form-textarea' style={{ height: '4rem' }} placeholder="94712345678,94712345679,94123456780" required={inputMethod === 'manual'}></textarea>
                                 </div>
                             )}
 
