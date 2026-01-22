@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
 import transporter from "../config/nodemailer.js";
 import axios from "axios";
-import { sendBrevoEmail } from "../utils/mailprovider.js";
+import { sendEmail } from "../utils/mailprovider.js";
 
 
 //Registering New User
