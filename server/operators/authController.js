@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
 import transporter from "../config/nodemailer.js";
 import axios from "axios";
-import { sendEmail } from "../utils/mailprovider.js";
+import { sendBrevoEmail } from "../utils/mailprovider.js";
 
 
 //Registering New User
@@ -132,34 +132,21 @@ export const sendOtp = async (req, res) => {
         }
 
         // Generate OTP
-        const otp = Math.floor(1000 + Math.random() * 9000);
-        user.otp = otp;
-        user.otpExpiry = Date.now() + 10 * 60 * 1000;
-        user.lastOtpSentAt = Date.now();
-        await user.save();
+       const otp = Math.floor(1000 + Math.random() * 9000);
+user.otp = otp;
+user.otpExpiry = Date.now() + 10 * 60 * 1000;
+user.lastOtpSentAt = Date.now();
+await user.save();
 
-        // Respond immediately to client
-        res.status(200).json({
-            success: true,
-            message: `OTP generated successfully for ${user.email}. Check your inbox.`
-        });
+// Respond immediately to client
+res.status(200).json({
+  success: true,
+  message: `OTP generated successfully for ${user.email}. Check your inbox.`,
+});
 
-
-        // Send email asynchronously in background
-(async () => {
-    try {
-        await transporter.sendMail({
-            from: process.env.SENDER_EMAIL,
-            to: user.email,
-            subject: "MsgBulkHUB Email Verification",
-            text: `Your OTP is ${otp}. It will expire in 10 minutes.`
-        });
-        console.log(`📧 OTP sent to ${user.email}`);
-    } catch (err) {
-        console.error(`❌ Failed to send OTP to ${user.email}:`, err);
-        // Optional: You could store a "failedEmailAttempts" in user model to track retries
-    }
-})();
+// Send email asynchronously
+const htmlContent = `<p>Your OTP is <strong>${otp}</strong>. It will expire in 10 minutes.</p>`;
+sendBrevoEmail(user.email, "MsgBulkHUB Email Verification", htmlContent);
 
 
     } catch (error) {
