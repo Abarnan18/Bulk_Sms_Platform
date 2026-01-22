@@ -96,21 +96,25 @@ export const logoutUser = async (req, res) => {
 export const sendOtp = async (req, res) => {
     try {
         const { userId, resend } = req.body;
-        const user = await userModel.findById(userId);
 
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "User ID is required" });
+        }
+
+        const user = await userModel.findById(userId);
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
         if (user.isVerified) {
-            return res.status(400).json({ success: false, message: "User is already verified" })
+            return res.status(400).json({ success: false, message: "User is already verified" });
         }
 
-        // Check for existing valid OTP if NOT a resend request
+        // Check existing OTP if not a resend
         if (!resend && user.otp && user.otpExpiry > Date.now()) {
             return res.status(200).json({
                 success: true,
-                message: "A valid verification code already exists. Please use that or wait to resend.",
+                message: "A valid OTP already exists. Use that or wait to resend.",
                 reusing: true
             });
         }
@@ -120,30 +124,39 @@ export const sendOtp = async (req, res) => {
             const timeLeft = Math.ceil((30000 - (Date.now() - new Date(user.lastOtpSentAt).getTime())) / 1000);
             return res.status(400).json({
                 success: false,
-                message: `Please wait ${timeLeft} seconds before requesting a new code.`
+                message: `Please wait ${timeLeft} seconds before requesting a new OTP.`
             });
         }
 
+        // Generate OTP
         const otp = Math.floor(1000 + Math.random() * 9000);
         user.otp = otp;
         user.otpExpiry = Date.now() + 10 * 60 * 1000;
         user.lastOtpSentAt = Date.now();
         await user.save();
 
-        const mailOptions = {
+        // Respond immediately to client
+        res.status(200).json({
+            success: true,
+            message: `OTP generated successfully for ${user.email}. Check your inbox.`
+        });
+
+        // Send email asynchronously
+        transporter.sendMail({
             from: process.env.SENDER_EMAIL,
             to: user.email,
-            subject: "E-Mail Verification",
+            subject: "MsgBulkHUB Email Verification",
             text: `Your OTP is ${otp}. It will expire in 10 minutes.`
-        }
-
-        await transporter.sendMail(mailOptions);
-        return res.status(200).json({ success: true, message: `Verification code sent to ${user.email}` })
+        })
+        .then(() => console.log(`📧 OTP sent to ${user.email}`))
+        .catch(err => console.error(`❌ Failed to send OTP to ${user.email}:`, err));
 
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message })
+        console.error("❌ Send OTP error:", error);
+        res.status(500).json({ success: false, message: "Unable to generate OTP. Try again later." });
     }
-}
+};
+
 
 //Verify OTP
 export const verifyOtp = async (req, res) => {
