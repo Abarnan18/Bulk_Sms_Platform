@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
 import transporter from "../config/nodemailer.js";
+import { sendBrevoEmail } from "../utils/brevoEmailService.js";
 
 //Registering New User
 export const registerUser = async (req, res) => {
@@ -141,15 +142,23 @@ export const sendOtp = async (req, res) => {
             message: `OTP generated successfully for ${user.email}. Check your inbox.`
         });
 
-        // Send email asynchronously
-        transporter.sendMail({
+        
+        // Send email asynchronously in background
+(async () => {
+    try {
+        await transporter.sendMail({
             from: process.env.SENDER_EMAIL,
             to: user.email,
             subject: "MsgBulkHUB Email Verification",
             text: `Your OTP is ${otp}. It will expire in 10 minutes.`
-        })
-        .then(() => console.log(`📧 OTP sent to ${user.email}`))
-        .catch(err => console.error(`❌ Failed to send OTP to ${user.email}:`, err));
+        });
+        console.log(`📧 OTP sent to ${user.email}`);
+    } catch (err) {
+        console.error(`❌ Failed to send OTP to ${user.email}:`, err);
+        // Optional: You could store a "failedEmailAttempts" in user model to track retries
+    }
+})();
+
 
     } catch (error) {
         console.error("❌ Send OTP error:", error);
