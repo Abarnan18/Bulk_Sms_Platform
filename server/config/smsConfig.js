@@ -4,7 +4,7 @@
 
 export const SMS_CONFIG = {
     // API Token from Text.lk dashboard
-    API_TOKEN: "3020|TLeOr59qTXrZH182XFYBOGwKhaE7jOSGeiFyHYCu886119af",
+    API_TOKEN: "3022|KL4guPIF7uyxCb2ehFfSqNQl5AnyGLsK0CAQnme7d9d8bfd7",
     
     // Endpoint URL
     ENDPOINT: "https://app.text.lk/api/http/sms/send",

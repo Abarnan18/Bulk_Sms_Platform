@@ -31,9 +31,7 @@ export const registerUser = async (req, res) => {
 
         const user = await userModel.create({
             email,
-            password: hashedPassword,
-            role: "user",
-            isVerified: false
+            password: hashedPassword
         });
 
         // Generate JWT token
