@@ -6,7 +6,7 @@ import axios from "axios";
  * @param {string} subject - Email subject
  * @param {string} text - Email plain text content
  */
-export const sendBrevoEmail = async (to, subject, text) => {
+export const sendEmail = async (to, subject, text) => {
     try {
         await axios.post(
             "https://api.brevo.com/v3/smtp/email",
